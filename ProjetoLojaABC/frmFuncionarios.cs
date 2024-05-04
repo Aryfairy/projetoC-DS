@@ -35,6 +35,7 @@ namespace ProjetoLojaABC
             InitializeComponent();
             desabilitarCampos();
             txtNome.Text = nome;
+            carregaFuncionario(txtNome.Text);
         }
 
         private void btnVoltar_Click(object sender, EventArgs e)
@@ -123,17 +124,16 @@ namespace ProjetoLojaABC
             comm.CommandType = CommandType.Text;
 
             comm.Parameters.Clear();
-
-            comm.Parameters.Add("@nome",MySqlDbType.VarChar,100).Value = txtNome.Text;
-            comm.Parameters.Add("@email",MySqlDbType.VarChar,100).Value = txtEmail.Text;
-            comm.Parameters.Add("@cpf",MySqlDbType.VarChar,14).Value = mskCPF.Text;
-            comm.Parameters.Add("@telCel",MySqlDbType.VarChar,10).Value = mskCelular.Text;
-            comm.Parameters.Add("@endereco",MySqlDbType.VarChar,100).Value = txtEndereco.Text;
-            comm.Parameters.Add("@numero",MySqlDbType.VarChar,5).Value = txtNumero.Text;
-            comm.Parameters.Add("@cep",MySqlDbType.VarChar,9).Value = mskCEP.Text;
-            comm.Parameters.Add("@bairro",MySqlDbType.VarChar,100).Value = txtBairro.Text;
-            comm.Parameters.Add("@cidade",MySqlDbType.VarChar,100).Value = txtCidade.Text;
-            comm.Parameters.Add("@estado",MySqlDbType.VarChar,10).Value = cbbEstado.Text;
+            comm.Parameters.Add("@nome", MySqlDbType.VarChar, 100).Value = txtNome.Text;
+            comm.Parameters.Add("@email", MySqlDbType.VarChar, 100).Value = txtEmail.Text;
+            comm.Parameters.Add("@cpf", MySqlDbType.VarChar, 14).Value = mskCPF.Text;
+            comm.Parameters.Add("@telCel", MySqlDbType.VarChar, 10).Value = mskCelular.Text;
+            comm.Parameters.Add("@endereco", MySqlDbType.VarChar, 100).Value = txtEndereco.Text;
+            comm.Parameters.Add("@numero", MySqlDbType.VarChar, 5).Value = txtNumero.Text;
+            comm.Parameters.Add("@cep", MySqlDbType.VarChar, 9).Value = mskCEP.Text;
+            comm.Parameters.Add("@bairro", MySqlDbType.VarChar, 100).Value = txtBairro.Text;
+            comm.Parameters.Add("@cidade", MySqlDbType.VarChar, 100).Value = txtCidade.Text;
+            comm.Parameters.Add("@estado", MySqlDbType.VarChar, 10).Value = cbbEstado.Text;
 
             comm.Connection = Conexao.obterConexao();
             int res = comm.ExecuteNonQuery();
@@ -162,10 +162,38 @@ namespace ProjetoLojaABC
 
         }
 
+        public void carregaFuncionario(String nome)
+        {
+            MySqlCommand comm = new MySqlCommand();
+            comm.CommandText = "select * from tbFuncionarios where nome= "+nome+" ";
+            comm.CommandType = CommandType.Text;
+            comm.Connection = Conexao.obterConexao();
+
+            MySqlDataReader DR;
+            DR = comm.ExecuteReader();
+
+            DR.Read();
+
+
+
+            txtCodigo.Text = DR.GetInt32(0).ToString();
+            txtNome.Text = DR.GetString(1);
+            txtEmail.Text = DR.GetString(2);
+            mskCPF.Text = DR.GetString(3);
+            mskCelular.Text = DR.GetString(4);
+            txtEndereco.Text = DR.GetString(5);
+            txtNumero.Text = DR.GetString(6);
+            mskCEP.Text = DR.GetString(7);
+            txtBairro.Text = DR.GetString(8);
+            txtCidade.Text = DR.GetString(9);
+            cbbEstado.Text = DR.GetString(10);
+        }
+
+
         private void btnCadastrar_Click(object sender, EventArgs e)
         {
 
-            if (txtNome.Text.Equals("") ||
+            if (txtCodigo.Text.Equals("") || txtNome.Text.Equals("") ||
                 txtEndereco.Text.Equals("") || txtCidade.Text.Equals("") ||
                 txtBairro.Text.Equals("") || txtNumero.Text.Equals("") ||
                 txtEmail.Text.Equals("") || mskCelular.Text.Equals("     -")
@@ -196,7 +224,7 @@ namespace ProjetoLojaABC
 
         public void buscaCEP(string cep)
         {
-            
+
         }
 
         private void mskCEP_KeyDown(object sender, KeyEventArgs e)
@@ -204,7 +232,7 @@ namespace ProjetoLojaABC
             if (e.KeyCode == Keys.Enter)
             {
                 WSCorreios.AtendeClienteClient ws = new WSCorreios.AtendeClienteClient();
-                WSCorreios.enderecoERP endereco = ws.consultaCEP(mskCEP.Text,"","");
+                WSCorreios.enderecoERP endereco = ws.consultaCEP(mskCEP.Text, "", "");
                 txtEndereco.Text = endereco.end;
                 txtBairro.Text = endereco.bairro;
                 txtCidade.Text = endereco.cidade;
